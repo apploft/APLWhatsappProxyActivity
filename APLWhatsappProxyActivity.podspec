@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name         = "APLWhatsappProxyActivity"
   s.version      = "0.0.1"
-  s.summary      = "A UIActivity for use when Whatsapp is not activated yet."
+  s.summary      = "A UIActivity to support sharing via whatsapp."
 
   s.description  = <<-DESC
                     Apple's UIActivityViewController does not display a Whatsapp Button.
