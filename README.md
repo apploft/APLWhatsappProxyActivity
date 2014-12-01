@@ -16,7 +16,7 @@ Import header file:
 	
 Initialize `APLWhatsappProxyActivity`:
 	
-	APLWhatsappProxyActivity *whatsappProxyActivity = 	[APLWhatsappProxyActivity proxyActivityIfNeeded];
+	APLWhatsappProxyActivity *whatsappProxyActivity = 	[APLWhatsappProxyActivity proxyActivity];
     NSArray *applicationActivities = @[whatsappProxyActivity];
     
 Finally init your `UIActivityViewController` with the `applicationActivities` array.
