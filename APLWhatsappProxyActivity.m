@@ -9,7 +9,7 @@
 #import "APLWhatsappProxyActivity.h"
 #import <Social/Social.h>
 
-static NSString * const kAPLWhatsappActivityType = @"de.zeit.sharing.whatsapp";
+static NSString * const kAPLWhatsappActivityType = @"de.apploft.sharing.whatsapp";
 static NSString * const kAPLWhatsappActivityName = @"Whatsapp";
 
 @interface APLWhatsappProxyActivity ()
