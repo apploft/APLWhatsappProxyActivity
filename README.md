@@ -2,7 +2,7 @@ APLWhatsappProxyActivity
 =========
 
 Apple's UIActivityViewController does not display a Whatsapp Button. We add a custom application activity here, to display a Whatsapp Button in this case. 
-Our activity composes a message text from the given activity items and opens the whatsapp app if it's installed on the device.
+Our activity composes a message text from the given activity items and opens the whatsapp app for sharing if it's installed on the device.
 
 ## Installation
 Install via cocoapods by adding this to your Podfile:
