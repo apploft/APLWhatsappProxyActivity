@@ -44,19 +44,19 @@ static NSString * const kAPLWhatsappActivityName = @"Whatsapp";
 }
 
 - (void)performActivity {
-    __block NSString *messageText = nil;
+    __block NSString *messageText = @"";
     [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger idx, BOOL *stop) {
         NSString *itemAsString = [self stringFromItem:item];
         [self addString:itemAsString toMessageText:&messageText currentIndex:idx];
     }];
     
-    if (messageText != nil) {
+    if ([messageText length] > 0) {
         NSString * whatsappURL = [NSString stringWithFormat:@"whatsapp://send?text=%@",messageText];
         NSURL * escapedWhatsappURL = [NSURL URLWithString:[whatsappURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
         if ([[UIApplication sharedApplication] canOpenURL: escapedWhatsappURL]) {
             [[UIApplication sharedApplication] openURL: escapedWhatsappURL];
         } else {
-            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"WhatsApp not installed." message:@"Your device has no WhatsApp installed." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"" message:@"No Whatsapp installed on the device." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [alert show];
         }
     }
