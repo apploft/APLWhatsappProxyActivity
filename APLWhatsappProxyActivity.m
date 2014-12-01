@@ -46,8 +46,7 @@ static NSString * const kAPLWhatsappActivityName = @"Whatsapp";
 - (void)performActivity {
     __block NSString *messageText = @"";
     [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger idx, BOOL *stop) {
-        NSString *itemAsString = [self stringFromActivityItem:item];
-        [self addString:itemAsString toMessageText:&messageText currentIndex:idx];
+        [self addString:[self stringFromActivityItem:item] toMessageText:&messageText currentIndex:idx];
     }];
     
     if ([messageText length] > 0) {
