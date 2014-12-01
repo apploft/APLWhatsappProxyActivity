@@ -2,8 +2,8 @@
 //  APLWhatsappProxyActivity.m
 //
 //
-//  Created by Heiko Wichmann on 04.04.2013.
-//  Copyright (c) 2013 apploft GmbH. All rights reserved.
+//  Created by Christopher Groß on 01.12.14.
+//  Copyright (c) 2014 apploft GmbH. All rights reserved.
 //
 
 #import "APLWhatsappProxyActivity.h"
@@ -18,7 +18,7 @@ static NSString * const kAPLWhatsappActivityName = @"Whatsapp";
 
 @implementation APLWhatsappProxyActivity
 
-+ (instancetype)proxyActivityIfNeeded {
++ (instancetype)proxyActivity {
     return [self new];
 }
 
@@ -46,7 +46,7 @@ static NSString * const kAPLWhatsappActivityName = @"Whatsapp";
 - (void)performActivity {
     __block NSString *messageText = @"";
     [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger idx, BOOL *stop) {
-        NSString *itemAsString = [self stringFromItem:item];
+        NSString *itemAsString = [self stringFromActivityItem:item];
         [self addString:itemAsString toMessageText:&messageText currentIndex:idx];
     }];
     
@@ -56,9 +56,11 @@ static NSString * const kAPLWhatsappActivityName = @"Whatsapp";
         if ([[UIApplication sharedApplication] canOpenURL: escapedWhatsappURL]) {
             [[UIApplication sharedApplication] openURL: escapedWhatsappURL];
         } else {
-            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"" message:@"No Whatsapp installed on the device." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"" message:@"No Whatsapp installed on the device." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [alert show];
         }
+    } else {
+        NSLog(@"Error sharing with Whatsapp. Nothing to share");
     }
 }
 
@@ -72,7 +74,7 @@ static NSString * const kAPLWhatsappActivityName = @"Whatsapp";
     }
 }
 
-- (NSString *)stringFromItem:(id)item {
+- (NSString *)stringFromActivityItem:(id)item {
     if ([item isKindOfClass:[NSString class]]) {
         return (NSString *)item;
     } else if ([item isKindOfClass:[NSURL class]]) {
