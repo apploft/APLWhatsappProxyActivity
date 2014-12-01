@@ -11,6 +11,7 @@
 
 static NSString * const kAPLWhatsappActivityType = @"de.apploft.sharing.whatsapp";
 static NSString * const kAPLWhatsappActivityName = @"Whatsapp";
+static NSString * const kAPLWhatsappActivityUrl = @"whatsapp://send?text=%@";
 
 @interface APLWhatsappProxyActivity ()
 @property (nonatomic, strong) NSArray *items;
@@ -50,16 +51,16 @@ static NSString * const kAPLWhatsappActivityName = @"Whatsapp";
     }];
     
     if ([messageText length] > 0) {
-        NSString * whatsappURL = [NSString stringWithFormat:@"whatsapp://send?text=%@",messageText];
+        NSString * whatsappURL = [NSString stringWithFormat:kAPLWhatsappActivityUrl, messageText];
         NSURL * escapedWhatsappURL = [NSURL URLWithString:[whatsappURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
         if ([[UIApplication sharedApplication] canOpenURL: escapedWhatsappURL]) {
             [[UIApplication sharedApplication] openURL: escapedWhatsappURL];
         } else {
-            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"" message:@"No Whatsapp installed on the device." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"" message:@"No Whatsapp installed on this device." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [alert show];
         }
     } else {
-        NSLog(@"Error sharing with Whatsapp. Nothing to share");
+        NSLog(@"Error sharing via Whatsapp. No message to share");
     }
 }
 
