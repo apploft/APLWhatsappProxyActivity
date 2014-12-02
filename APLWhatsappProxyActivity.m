@@ -12,6 +12,7 @@
 static NSString * const kAPLWhatsappActivityType = @"de.apploft.sharing.whatsapp";
 static NSString * const kAPLWhatsappActivityName = @"Whatsapp";
 static NSString * const kAPLWhatsappActivityUrl = @"whatsapp://send?text=%@";
+static NSString * const kAPLWhatsappTestScheme = @"whatsapp://";
 
 @interface APLWhatsappProxyActivity ()
 @property (nonatomic, strong) NSArray *items;
@@ -20,7 +21,10 @@ static NSString * const kAPLWhatsappActivityUrl = @"whatsapp://send?text=%@";
 @implementation APLWhatsappProxyActivity
 
 + (instancetype)proxyActivity {
-    return [self new];
+    if ([[UIApplication sharedApplication] canOpenURL:kAPLWhatsappTestScheme]) {
+        return [self new];
+    }
+    return nil;
 }
 
 - (NSString *)activityTitle {
@@ -37,7 +41,7 @@ static NSString * const kAPLWhatsappActivityUrl = @"whatsapp://send?text=%@";
 }
 
 - (BOOL)canPerformWithActivityItems:(NSArray *)activityItems {
-    return YES;
+    return [self activityItemsContainUrlAndString:activityItems];
 }
 
 - (void)prepareWithActivityItems:(NSArray *)activityItems {
@@ -50,18 +54,9 @@ static NSString * const kAPLWhatsappActivityUrl = @"whatsapp://send?text=%@";
         [self addString:[self stringFromActivityItem:item] toMessageText:&messageText currentIndex:idx];
     }];
     
-    if ([messageText length] > 0) {
-        NSString * whatsappURL = [NSString stringWithFormat:kAPLWhatsappActivityUrl, messageText];
-        NSURL * escapedWhatsappURL = [NSURL URLWithString:[whatsappURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-        if ([[UIApplication sharedApplication] canOpenURL: escapedWhatsappURL]) {
-            [[UIApplication sharedApplication] openURL: escapedWhatsappURL];
-        } else {
-            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"" message:@"No Whatsapp installed on this device." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-            [alert show];
-        }
-    } else {
-        NSLog(@"Error sharing via Whatsapp. No message to share");
-    }
+    NSString * whatsappURL = [NSString stringWithFormat:kAPLWhatsappActivityUrl, messageText];
+    NSURL * escapedWhatsappURL = [NSURL URLWithString:[whatsappURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    [[UIApplication sharedApplication] openURL: escapedWhatsappURL];
 }
 
 - (void)addString:(NSString *)text toMessageText:(NSString **)messageText currentIndex:(NSUInteger)index {
@@ -81,6 +76,19 @@ static NSString * const kAPLWhatsappActivityUrl = @"whatsapp://send?text=%@";
         return [(NSURL *)item absoluteString];
     }
     return nil;
+}
+
+- (BOOL)activityItemsContainUrlAndString:(NSArray *)items {
+    __block BOOL hasUrlObject = NO;
+    __block BOOL hasStringObject = NO;
+    [items enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isKindOfClass:[NSURL class]]) {
+            hasUrlObject = YES;
+        } else if ([obj isKindOfClass:[NSString class]]) {
+            hasStringObject = YES;
+        }
+    }];
+    return hasUrlObject && hasStringObject;
 }
 
 @end

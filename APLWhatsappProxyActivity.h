@@ -11,7 +11,7 @@
 @interface APLWhatsappProxyActivity : UIActivity
 
 /**
- *	Returns an proxy activity.
+ *	Returns an proxy activity if Whatsapp is installed on the device.
  *	@return	APLWhatsappProxyActivity
  */
 + (instancetype) proxyActivity;
