@@ -51,10 +51,7 @@ static NSString * const kAPLWhatsappTestUrl = @"whatsapp://";
 }
 
 - (void)performActivity {
-    __block NSString *messageText = @"";
-    [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger idx, BOOL *stop) {
-        [self addString:[self stringFromActivityItem:item] toMessageText:&messageText currentIndex:idx];
-    }];
+    NSString *messageText = [self composedMessageTextFromItems];
     
     NSURLComponents *whatsappUrl = [NSURLComponents new];
     whatsappUrl.scheme = kAPLWhatsappActivityScheme;
@@ -63,14 +60,15 @@ static NSString * const kAPLWhatsappTestUrl = @"whatsapp://";
     [self activityDidFinish:[[UIApplication sharedApplication] openURL:whatsappUrl.URL]];
 }
 
-- (void)addString:(NSString *)text toMessageText:(NSString **)messageText currentIndex:(NSUInteger)index {
-    if (text == nil) return;
-    
-    if (index < [self.items count] - 1) {
-        *messageText = [*messageText stringByAppendingString:[NSString stringWithFormat:@"%@\n", text]];
-    } else {
-        *messageText = [*messageText stringByAppendingString:[NSString stringWithFormat:@"%@", text]];
-    }
+- (NSString *)composedMessageTextFromItems {
+    __block NSMutableString *message = [NSMutableString new];
+    [self.items enumerateObjectsUsingBlock:^(id item, NSUInteger idx, BOOL *stop) {
+        if ([self stringFromActivityItem:item] != nil) {
+            NSString *stringToAppend = message.length > 0 ? [NSString stringWithFormat:@"\n%@", [self stringFromActivityItem:item]] : [self stringFromActivityItem:item];
+            [message appendString:stringToAppend];
+        }
+    }];
+    return message;
 }
 
 - (NSString *)stringFromActivityItem:(id)item {
