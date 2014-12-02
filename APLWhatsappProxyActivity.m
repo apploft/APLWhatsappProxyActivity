@@ -11,8 +11,10 @@
 
 static NSString * const kAPLWhatsappActivityType = @"de.apploft.sharing.whatsapp";
 static NSString * const kAPLWhatsappActivityName = @"Whatsapp";
-static NSString * const kAPLWhatsappActivityUrl = @"whatsapp://send?text=%@";
-static NSString * const kAPLWhatsappTestScheme = @"whatsapp://";
+static NSString * const kAPLWhatsappActivityScheme = @"whatsapp";
+static NSString * const kAPLWhatsappActivityHost = @"send";
+static NSString * const kAPLWhatsappAvtivityQuery = @"text=%@";
+static NSString * const kAPLWhatsappTestUrl = @"whatsapp://";
 
 @interface APLWhatsappProxyActivity ()
 @property (nonatomic, strong) NSArray *items;
@@ -21,7 +23,7 @@ static NSString * const kAPLWhatsappTestScheme = @"whatsapp://";
 @implementation APLWhatsappProxyActivity
 
 + (instancetype)proxyActivity {
-    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:kAPLWhatsappTestScheme]]) {
+    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:kAPLWhatsappTestUrl]]) {
         return [self new];
     }
     return nil;
@@ -54,9 +56,11 @@ static NSString * const kAPLWhatsappTestScheme = @"whatsapp://";
         [self addString:[self stringFromActivityItem:item] toMessageText:&messageText currentIndex:idx];
     }];
     
-    NSString * whatsappURLString = [NSString stringWithFormat:kAPLWhatsappActivityUrl, messageText];
-    NSURLComponents *whatsappUrl = [NSURLComponents componentsWithString:[whatsappURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-    [[UIApplication sharedApplication] openURL:whatsappUrl.URL];
+    NSURLComponents *whatsappUrl = [NSURLComponents new];
+    whatsappUrl.scheme = kAPLWhatsappActivityScheme;
+    whatsappUrl.host = kAPLWhatsappActivityHost;
+    whatsappUrl.query = [NSString stringWithFormat:kAPLWhatsappAvtivityQuery, messageText];
+    [self activityDidFinish:[[UIApplication sharedApplication] openURL:whatsappUrl.URL]];
 }
 
 - (void)addString:(NSString *)text toMessageText:(NSString **)messageText currentIndex:(NSUInteger)index {
