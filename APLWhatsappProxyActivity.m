@@ -21,7 +21,7 @@ static NSString * const kAPLWhatsappTestScheme = @"whatsapp://";
 @implementation APLWhatsappProxyActivity
 
 + (instancetype)proxyActivity {
-    if ([[UIApplication sharedApplication] canOpenURL:kAPLWhatsappTestScheme]) {
+    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:kAPLWhatsappTestScheme]]) {
         return [self new];
     }
     return nil;
@@ -41,7 +41,7 @@ static NSString * const kAPLWhatsappTestScheme = @"whatsapp://";
 }
 
 - (BOOL)canPerformWithActivityItems:(NSArray *)activityItems {
-    return [self activityItemsContainUrlAndString:activityItems];
+    return [self activityItems:activityItems containObjectsOfType:@[[NSURL class], [NSString class]]];
 }
 
 - (void)prepareWithActivityItems:(NSArray *)activityItems {
@@ -54,9 +54,9 @@ static NSString * const kAPLWhatsappTestScheme = @"whatsapp://";
         [self addString:[self stringFromActivityItem:item] toMessageText:&messageText currentIndex:idx];
     }];
     
-    NSString * whatsappURL = [NSString stringWithFormat:kAPLWhatsappActivityUrl, messageText];
-    NSURL * escapedWhatsappURL = [NSURL URLWithString:[whatsappURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-    [[UIApplication sharedApplication] openURL: escapedWhatsappURL];
+    NSString * whatsappURLString = [NSString stringWithFormat:kAPLWhatsappActivityUrl, messageText];
+    NSURLComponents *whatsappUrl = [NSURLComponents componentsWithString:[whatsappURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    [[UIApplication sharedApplication] openURL:whatsappUrl.URL];
 }
 
 - (void)addString:(NSString *)text toMessageText:(NSString **)messageText currentIndex:(NSUInteger)index {
@@ -78,17 +78,20 @@ static NSString * const kAPLWhatsappTestScheme = @"whatsapp://";
     return nil;
 }
 
-- (BOOL)activityItemsContainUrlAndString:(NSArray *)items {
-    __block BOOL hasUrlObject = NO;
-    __block BOOL hasStringObject = NO;
-    [items enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        if ([obj isKindOfClass:[NSURL class]]) {
-            hasUrlObject = YES;
-        } else if ([obj isKindOfClass:[NSString class]]) {
-            hasStringObject = YES;
-        }
+/*
+ Check if the array of activity items contains one or more objects that correspond
+ to the object types the UIActivity supports
+ */
+- (BOOL)activityItems:(NSArray *)items containObjectsOfType:(NSArray *)objectTypes {
+    __block NSInteger foundObjectTypes = 0;
+    [items enumerateObjectsUsingBlock:^(id item, NSUInteger idx, BOOL *stop) {
+        [objectTypes enumerateObjectsUsingBlock:^(id objectType, NSUInteger idx, BOOL *stop) {
+            if ([item isKindOfClass:[objectType class]]) {
+                foundObjectTypes++;
+            }
+        }];
     }];
-    return hasUrlObject && hasStringObject;
+    return foundObjectTypes > 0;
 }
 
 @end
